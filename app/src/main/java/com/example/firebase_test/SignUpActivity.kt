@@ -12,7 +12,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
@@ -20,10 +19,8 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class SignUpActivity : AppCompatActivity() {
-    //private val firebaseAuth: FirebaseAuth? = null
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
-    //private val RC_SIGN_IN = 99
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val binding = ActivitySignUpBinding.inflate(layoutInflater)
@@ -35,59 +32,49 @@ class SignUpActivity : AppCompatActivity() {
         //google 로그인 옵션 구성, google API 클라이언트 생성
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.your_web_client_id))
-            //'R.string.default_web_client_id' 에는 본인의 클라이언트 아이디를 넣어주시면 됩니다.
             .requestEmail()
             .build()
         //내 앱에서 구글의 계정을 가져다 쓸거다
         googleSignInClient = GoogleSignIn.getClient(this,gso)
 
 
+        //firebase auth 객체
+        auth = FirebaseAuth.getInstance()
+        if (auth.getCurrentUser() != null) { //로그인 되어있으면 main화면으로
+            val intent = Intent(application, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
+        //다른 앱/액티비티가 실행된 후, 그 실행이 끝난 후 다시 이 액티비티로 돌아왔을 때
         val result = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-
             it.resultCode
-            println("it.resultCode = $it.resultCode")
             it.data
-            println("it.data = $it.data")
 
-            //if (it.requestCode == RC_SIGN_IN) {
-                if (it.resultCode == RESULT_OK) { //ok
-                    //결과 Intent(data 매개변수) 에서 구글로그인 결과 꺼내오기
-                    val result = Auth.GoogleSignInApi.getSignInResultFromIntent(it.data!!)!!
-                    println("result = $result")
-                    println("result.isSuccess = $result.isSuccess")
+            if (it.resultCode == RESULT_OK) { //ok
+                //결과 Intent(data 매개변수) 에서 구글로그인 결과 꺼내오기
+                val result = Auth.GoogleSignInApi.getSignInResultFromIntent(it.data!!)!!
 
-                    //정상적으로 로그인되었다면
-                    if (result.isSuccess) { //여기가 안됨
-
-                        //우리의 Firebase 서버에 사용자 이메일정보보내기
-                        val account = result.signInAccount
-                        firebaseAuthWithGoogle(account)
-                        Toast.makeText(
-                            this, "Firebase 서버에 사용자 이메일정보보내기",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                //정상적으로 로그인되었다면
+                if (result.isSuccess) {
+                    //우리의 Firebase 서버에 사용자 이메일정보보내기
+                    val account = result.signInAccount
+                    firebaseAuthWithGoogle(account)
+                    Toast.makeText(
+                        this, "Firebase 서버에 사용자 이메일정보보내기",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-            //}
+            }
+
         }
 
         binding.googleButton.setOnClickListener(){ //구글로 로그인하기 클릭하면
             //로그인 통합 페이지로 넘김
             val signInIntent = googleSignInClient.signInIntent
-            println("signInIntent = $signInIntent")
 
-            //signInIntent, RC_SIGN_IN
             //startActivityForResult(signInIntent, RC_SIGN_IN)
             result.launch(signInIntent)
-        }
-
-        //firebase auth 객체
-        auth = FirebaseAuth.getInstance()
-        println("auth = $auth")
-        if (auth.getCurrentUser() != null) {
-            val intent = Intent(application, MainActivity::class.java)
-            startActivity(intent)
-            finish()
         }
 
     }//onCreate끝
@@ -101,26 +88,6 @@ class SignUpActivity : AppCompatActivity() {
         }
     }//onStart끝
 
-    //startActivityResult()로 인해 다른 앱/액티비티가 실행된 후, 그 실행이 끝난 후 다시 이 액티비티로 돌아왔을 때
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        if (requestCode == RC_SIGN_IN) {
-//            if (resultCode == Activity.RESULT_OK) {
-//                //결과 Intent(data 매개변수) 에서 구글로그인 결과 꺼내오기
-//                val result = Auth.GoogleSignInApi.getSignInResultFromIntent(data!!)!!
-//
-//                //정상적으로 로그인되었다면
-//                if (result.isSuccess) {
-//                    //우리의 Firebase 서버에 사용자 이메일정보보내기
-//                    val account = result.signInAccount
-//                    firebaseAuthWithGoogle(account)
-//                }
-//            }
-//        }
-//    }
-
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount?) {
         Toast.makeText(
@@ -132,7 +99,6 @@ class SignUpActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) { //로그인에 성공하면
-                    Log.w("SignUpActivity", "firebaseAuthWithGoogle 성공", task.exception)
                     moveMainPage(auth.currentUser)
                 } else { //로그인 실패하면
                     Log.w("SignUpActivity", "firebaseAuthWithGoogle 실패", task.exception)
@@ -146,9 +112,6 @@ class SignUpActivity : AppCompatActivity() {
             finish()
         }
     }
-//    private fun signIn() {
-//        val signInIntent = googleSignInClient.signInIntent
-//        startActivityForResult(signInIntent, RC_SIGN_IN)
-//    }
+
 
 }

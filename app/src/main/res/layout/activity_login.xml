@@ -13,7 +13,7 @@
         android:layout_marginTop="100dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:hint="Email@naver.com"
+        android:hint="Email@google.com"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

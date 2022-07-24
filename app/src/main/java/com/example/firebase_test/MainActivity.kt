@@ -9,6 +9,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.firebase_test.databinding.ActivityMainBinding
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -17,6 +18,7 @@ import com.google.firebase.ktx.Firebase
 class MainActivity : AppCompatActivity() {
     private var auth: FirebaseAuth? = null
     private val viewModel: MyViewModel by viewModels()
+    private lateinit var googleSignInClient: GoogleSignInClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,10 +29,11 @@ class MainActivity : AppCompatActivity() {
         //로그아웃
         binding.logout.setOnClickListener {
             //로그인 화면으로
-//            val intent = Intent(this, LoginActivity::class.java)
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             moveLoginPage()
-            auth?.signOut()
+            //auth?.signOut()
+            // Google sign out
+            FirebaseAuth.getInstance().signOut()
+
         }
 
         binding.floatingActionButton.setOnClickListener {
@@ -81,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //로그인 액티비티 호출
-    fun moveLoginPage() {
+    private fun moveLoginPage() {
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
 
