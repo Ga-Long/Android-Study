@@ -5,8 +5,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private var instance: RetrofitClient? = null
-    private lateinit var retrofitInterface: RetrofitInterface
     private var baseUrl : String = "https://yts.mx/"
 
     fun createRetrofit(): RetrofitInterface {

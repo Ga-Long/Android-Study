@@ -15,7 +15,7 @@ data class MovieAPIResponse(
 
     @SerializedName("data")
     @Expose
-    var data: MovieAPIResult,
+    var data: MovieAPIResult, //객체로 받기
 
     )
 
@@ -34,7 +34,7 @@ data class MovieAPIResult(
 
     @SerializedName("movies")
     @Expose
-    var movies: List<MovieData>,
+    var movies: List<MovieData>, //배열로 받기
 )
 
 data class MovieData(
@@ -45,6 +45,10 @@ data class MovieData(
     @SerializedName("summary")
     @Expose
     var summary: String,
+
+    @SerializedName("year")
+    @Expose
+    var year: String,
 
     @SerializedName("medium_cover_image")
     @Expose
