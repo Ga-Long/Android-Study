@@ -6,21 +6,29 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class MainAcitivityVeiwModel : ViewModel() {
-    val getMovieList = MutableLiveData<ArrayList<MovieAPIResponse>>()
-    val items = ArrayList<MovieAPIResponse>()
+    private val dataSet: ArrayList<List<String>> = arrayListOf()
+    private lateinit var adapter: MovieAdapter
 
-    fun addItem(item: MovieAPIResponse) {
-        items.add(item)
-        getMovieList.value = items
+    fun addItem(item: List<String>) {
+        dataSet.add(item)
+
     }
 
-    fun updateItem(pos: Int, item: MovieAPIResponse) {
-        items[pos] = item
-        getMovieList.value = items
+    fun updateItem(pos: Int, item: List<String>) {
+        dataSet[pos] = item
     }
 
     fun deleteItem(pos: Int) {
-        items.removeAt(pos)
-        getMovieList.value = items
+        dataSet.removeAt(pos)
     }
+
+    fun getData(pos: Int): List<String> {
+        return dataSet[pos]
+    }
+
+    fun getData(): ArrayList<List<String>> {
+        return dataSet
+    }
+
+
 }
